@@ -31,19 +31,19 @@ VALIDATE () {
     fi
 }
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>>LOG_FILE
 VALIDATE $? "disabling nodejs"
 
-dnf module enable nodejs:20 -y
+dnf module enable nodejs:20 -y &>>LOG_FILE
 VALIDATE $? "enabling nodejs"
 
-dnf insatll nodejs -y 
+dnf insatll nodejs -y &>>LOG_FILE
 VALIDATE $? "installing nodejs"
 
 id roboshop
 if [ $? -ne 0 ]
 then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>LOG_FILE
     VALIDATE $? "creating roboshop system user"
 else
     echo -e "system user roboshop already present...$Y SKIPPING $N"
@@ -52,26 +52,26 @@ fi
 mkdir -p /app
 VALIDATE $? "creating app directory"
 
-curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip
+curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip &>>LOG_FILE
 VALIDATE $? "downloading cart"
 
 rm -rf /app*
 cd /app 
-unzip /tmp/cart.zip
+unzip /tmp/cart.zip &>>LOG_FILE
 VALIDATE $? "unzipping cart"
 
-npm insatll
+npm insatll &>>LOG_FILE
 VALIDATE $? "installing dependencies"
 
 cp $SCRIPT_NAME/cart.service /etc/systemd/system/cart.service
 VALIDATE $? "copying cart service"
 
-systemctl daemon-reload
-systemctl enable cart 
+systemctl daemon-reload &>>LOG_FILE
+systemctl enable cart &>>LOG_FILE
 systemctl start cart
 VALIDATE $? "starting cart"
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $START_TIME - $END_TIME ))
 
-echo -e "script execution successfully completed,$Y time taken: $TOTAL_TIME seconds $N"
+echo -e "script execution successfully completed,$Y time taken: $TOTAL_TIME seconds $N" | tee -a $LOG_FILE
