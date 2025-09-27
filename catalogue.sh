@@ -24,9 +24,9 @@ fi
 VALIDATE () {
     if [ $1 -eq 0 ]
     then
-        echo -e "installing $2 is...$G SUCCESSFUL $N" | tee -a $LOG_FILE
+        echo -e "$2 is...$G SUCCESSFUL $N" | tee -a $LOG_FILE
     else
-        echo -e "installing $2 is...$R FAILURE $N" | tee -a $LOG_FILE
+        echo -e "$2 is...$R FAILURE $N" | tee -a $LOG_FILE
         exit 1
     fi
 }
@@ -64,7 +64,7 @@ cd /app
 npm install &>>$LOG_FILE
 VALIDATE $? "install dpendencies"
 
-cp $SCRIPT_DIR/catalogue.service  /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
 VALIDATE $? "copying catalogue service"
 
 systemctl daemon-reload &>>$LOG_FILE
